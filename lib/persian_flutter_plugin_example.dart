@@ -1,24 +1,20 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
+import 'package:persian_flutter_plugin_example/plugin_channel.dart';
+import 'package:persian_flutter_plugin_example/plugin_ffi_bridge.dart';
 
 class PersianFlutterPluginExample {
-  static const MethodChannel _methodChannel =
-      MethodChannel('com.persian_flutter/plugin');
+  static late final _ffiBridge = PluginFFIBridge();
 
-  static const EventChannel _eventChannel =
-      EventChannel('com.persian_flutter/plugin/isCharging');
+  static Future<num> getBatteryLevel([bool asDouble = false]) =>
+      PluginChannel.getBatteryLevel(asDouble);
 
-  static Future<num> getBatteryLevel([bool asDouble = false]) async =>
-      await _methodChannel
-          .invokeMethod('getBatteryLevel', {'as_double': asDouble});
+  static Future<bool> isLowPowerMode() => PluginChannel.isLowPowerMode();
 
-  static Future<bool> isLowPowerMode() async =>
-      await _methodChannel.invokeMethod('isLowPowerMode');
+  static Future<bool> isCharging() => PluginChannel.isCharging();
 
-  static Future<bool> isCharging() async =>
-      await _methodChannel.invokeMethod('isCharging');
+  static Stream<bool> get isChargingStream => PluginChannel.isChargingStream;
 
-  static Stream<bool> get isChargingStream =>
-      _eventChannel.receiveBroadcastStream().cast();
+  static String getSuggestion(double batteryLevel, bool isLowPowerMode) =>
+      _ffiBridge.getSuggestion(batteryLevel, isLowPowerMode);
 }

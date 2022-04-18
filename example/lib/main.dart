@@ -3,6 +3,8 @@ import 'dart:async';
 
 import 'package:persian_flutter_plugin_example/persian_flutter_plugin_example.dart';
 
+const asDouble = false;
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatefulWidget {
@@ -16,6 +18,7 @@ class _MyAppState extends State<MyApp> {
   late final StreamSubscription<bool> _isChargingSubscription;
   bool _lowPowerMode = false, _isCharging = false;
   num _batteryLevel = -1;
+  String? _suggestion;
 
   @override
   void initState() {
@@ -31,8 +34,11 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initState() async {
     final lowPowerMode = await PersianFlutterPluginExample.isLowPowerMode();
-    final batteryLevel = await PersianFlutterPluginExample.getBatteryLevel();
+    final batteryLevel =
+        await PersianFlutterPluginExample.getBatteryLevel(asDouble);
     final isCharging = await PersianFlutterPluginExample.isCharging();
+    _suggestion = PersianFlutterPluginExample.getSuggestion(
+        asDouble ? batteryLevel.toDouble() : batteryLevel / 100, lowPowerMode);
     _isChargingSubscription = PersianFlutterPluginExample.isChargingStream
         .listen(_isChargingEventReceived);
 
@@ -57,6 +63,8 @@ class _MyAppState extends State<MyApp> {
                 Text('Low power mode is ${_lowPowerMode ? 'on' : 'off'}'),
                 Text('Battery level is $_batteryLevel'
                     ' and is ${_isCharging ? 'Charging' : 'Discharging'}'),
+                if(_suggestion!=null)
+                  Text('Suggestion: $_suggestion')
               ],
               mainAxisAlignment: MainAxisAlignment.center,
             ),
