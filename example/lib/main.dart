@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 import 'package:persian_flutter_plugin_example/persian_flutter_plugin_example.dart';
 
@@ -15,7 +14,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late final StreamSubscription<bool> _isChargingSubscription;
   bool _lowPowerMode = false, _isCharging = false;
   num _batteryLevel = -1;
   String? _suggestion;
@@ -26,12 +24,6 @@ class _MyAppState extends State<MyApp> {
     _initState();
   }
 
-  @override
-  void dispose() {
-    _isChargingSubscription.cancel();
-    super.dispose();
-  }
-
   Future<void> _initState() async {
     final lowPowerMode = await PersianFlutterPluginExample.isLowPowerMode();
     final batteryLevel =
@@ -39,8 +31,6 @@ class _MyAppState extends State<MyApp> {
     final isCharging = await PersianFlutterPluginExample.isCharging();
     _suggestion = PersianFlutterPluginExample.getSuggestion(
         asDouble ? batteryLevel.toDouble() : batteryLevel / 100, lowPowerMode);
-    _isChargingSubscription = PersianFlutterPluginExample.isChargingStream
-        .listen(_isChargingEventReceived);
 
     if (!mounted) return;
 
@@ -50,8 +40,6 @@ class _MyAppState extends State<MyApp> {
       _batteryLevel = batteryLevel;
     });
   }
-
-  _isChargingEventReceived(bool event) => setState(() => _isCharging = event);
 
   @override
   Widget build(BuildContext context) => MaterialApp(
